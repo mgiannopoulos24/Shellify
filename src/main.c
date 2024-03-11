@@ -24,11 +24,11 @@ void exitShell() {
     exit(EXIT_SUCCESS);
 }
 
-bool externalCommand(const char *fname) {
+bool externalCommand(char *args[]) {
     const char *directory = "/usr/bin/";
     char filepath[1033];
 
-    sprintf(filepath, "%s/%s", directory, fname);
+    sprintf(filepath, "%s/%s", directory, args[0]);
 
     if (access(filepath, F_OK) == 0) {
         return true;
@@ -36,12 +36,12 @@ bool externalCommand(const char *fname) {
     return false;
 }
 
-void commandHandler(const char *str) {
+void commandHandler(char *tokens[]) {
     internalCommand builtIn[] = {
         {"cd", changeDirectory},
         /* {"pwd", printWorkingDirectory}, */
         /* {"echo", echo}, */
-        /* {"exit", exitShell}, */
+        {"exit", exitShell},
         /* {"source", sourceFile}, */
         /* {"kill", killProcess}, */
         /* {"man", showManual} */
@@ -50,18 +50,17 @@ void commandHandler(const char *str) {
     int commandsCount = sizeof(builtIn) / sizeof(builtIn[0]);
 
     for(int i = 0; i < commandsCount; i++) {
-        if(strcmp(str, builtIn[i].command) == 0) {
+        if(strcmp(tokens[0], builtIn[i].command) == 0) {
             builtIn[i].function();
             return;
         }
     }
     
-    if(externalCommand(str)) {
-        printf("Command Exists\n");
+    if(!externalCommand(tokens)) {
+        printf("Command not found: %s\n", tokens[0]);
+        return;
     }
-    else {
-        printf("Command not found: %s\n", str);
-    }
+    execvp(tokens[0], tokens);
 }
 
 int main(int argc, char *argv[]) {    
@@ -89,7 +88,9 @@ int main(int argc, char *argv[]) {
         token = strtok(NULL, " ");
     }
     free(str);
+    tokens = realloc(tokens, (tokenCount + 1) * sizeof(char*));
+    tokens[tokenCount] = NULL;
 
-    commandHandler(tokens[0]);
+    commandHandler(tokens);
     free(tokens);
 }
