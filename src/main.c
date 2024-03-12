@@ -26,7 +26,8 @@ void exitShell() {
 
 bool externalCommand(char *args[]) {
     const char *directory = "/usr/bin/";
-    char filepath[1033];
+    unsigned int pathSize = strlen(directory) + strlen(args[0]) + 1; 
+    char filepath[pathSize];
 
     sprintf(filepath, "%s/%s", directory, args[0]);
 
