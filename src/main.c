@@ -28,11 +28,9 @@ void printWorkingDirectory() {
 }
 
 void changeDirectory(char *tokens[]) {
-    printf("%s\n", tokens[1]);
     if(chdir(tokens[1]) != 0) {
         printf("Could not change directory to %s\n", tokens[1]);
     }
-    printWorkingDirectory();
 }
 
 void exitShell() {
@@ -79,34 +77,42 @@ void commandHandler(char *tokens[]) {
     execvp(tokens[0], tokens);
 }
 
-int main(int argc, char *argv[]) {    
-    char *str = NULL, *token = NULL, c = '\0';
-    char **tokens = NULL;
-
-    int i = 0;
-    int tokenCount = 0;
-
-    str = (char*)malloc(sizeof(char));
-
-    printf("sheLLiFY >>> ");
-
-    while ((c = getchar()) != '\n') {
-        str = realloc(str, (i + 1) * sizeof(char));
-        str[i++] = c;
-    }
-    
-    tokens = (char**)(malloc(sizeof(char*)));
-    token = strtok(str, " ");
+void tokenizeInput(char *input, char **tokens[], int *tokenCount) {
+    char *token = strtok(input, " ");
 
     while(token != NULL) {
-        tokens = realloc(tokens, (tokenCount + 1) * sizeof(char*));
-        tokens[tokenCount++] = strndup(token, strlen(token));
+        (*tokenCount)++;
+        *tokens = realloc(*tokens, (*tokenCount) * sizeof(char *));
+        (*tokens)[(*tokenCount) - 1] = strndup(token, strlen(token));
         token = strtok(NULL, " ");
     }
-    free(str);
-    tokens = realloc(tokens, (tokenCount + 1) * sizeof(char*));
-    tokens[tokenCount] = NULL;
+    *tokens = realloc(*tokens, ((*tokenCount) + 1) * sizeof(char *));
+    (*tokens)[(*tokenCount)] = NULL;
+}
 
-    commandHandler(tokens);
-    free(tokens);
+int main(int argc, char *argv[]) {    
+    while(1) {
+        char *str = NULL, c = '\0', **tokens = NULL;
+        int tokenCount = 0, size = 0;
+
+        str = (char*)malloc(sizeof(char));
+
+        printf("sheLLiFY >>> ");
+
+        while ((c = getchar()) != '\n') {
+            str = realloc(str, (size + 1) * sizeof(char));
+            str[size++] = c;
+        }
+        str[size] = '\0';
+       
+        tokenizeInput(str, &tokens, &tokenCount);
+
+        commandHandler(tokens);
+
+        for(int i = 0; i < tokenCount; i++) {
+            free(tokens[i]);
+        }
+        free(tokens);
+        free(str);
+    }
 }
