@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#define PATH_MAX 4096
 
 typedef struct {
     const char *command;
@@ -11,11 +12,20 @@ typedef struct {
 
 void exitShell();
 void changeDirectory(const char **tokens);
-/* void printWorkingDirectory(); */
+void printWorkingDirectory();
 /* void echo(); */
 /* void sourceFile(); */
 /* void killProcess(); */
 /* void showManual(); */
+
+void printWorkingDirectory() {
+    char cwd[PATH_MAX];
+    if(getcwd(cwd, sizeof(cwd)) != NULL) {
+        printf("%s\n", cwd);
+        return;
+    }
+    printf("Could not print cwd\n");
+}
 
 void changeDirectory(const char **tokens) {
 }
@@ -40,7 +50,7 @@ bool externalCommand(char *args[]) {
 void commandHandler(char *tokens[]) {
     internalCommand builtIn[] = {
         {"cd", changeDirectory},
-        /* {"pwd", printWorkingDirectory}, */
+        {"pwd", printWorkingDirectory},
         /* {"echo", echo}, */
         {"exit", exitShell},
         /* {"source", sourceFile}, */
