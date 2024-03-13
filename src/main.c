@@ -7,11 +7,11 @@
 
 typedef struct {
     const char *command;
-    void (*function)();
+    void (*function)(char *[]);
 } internalCommand;
 
 void exitShell();
-void changeDirectory(const char **tokens);
+void changeDirectory(char *tokens[]);
 void printWorkingDirectory();
 /* void echo(); */
 /* void sourceFile(); */
@@ -27,7 +27,12 @@ void printWorkingDirectory() {
     printf("Could not print cwd\n");
 }
 
-void changeDirectory(const char **tokens) {
+void changeDirectory(char *tokens[]) {
+    printf("%s\n", tokens[1]);
+    if(chdir(tokens[1]) != 0) {
+        printf("Could not change directory to %s\n", tokens[1]);
+    }
+    printWorkingDirectory();
 }
 
 void exitShell() {
@@ -62,7 +67,7 @@ void commandHandler(char *tokens[]) {
 
     for(int i = 0; i < commandsCount; i++) {
         if(strcmp(tokens[0], builtIn[i].command) == 0) {
-            builtIn[i].function();
+            builtIn[i].function(tokens);
             return;
         }
     }
