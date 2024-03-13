@@ -90,21 +90,27 @@ void tokenizeInput(char *input, char **tokens[], int *tokenCount) {
     (*tokens)[(*tokenCount)] = NULL;
 }
 
+char *readInput() {
+    char *str = NULL, c; 
+    int size = 0;
+
+    str = (char*)malloc(sizeof(char));
+
+    while ((c = getchar()) != '\n') {
+        str = realloc(str, (size + 1) * sizeof(char));
+        str[size++] = c;
+    }
+    str = realloc(str, (size + 1) * sizeof(char));
+    str[size] = '\0';
+    return str;
+}
+
 int main(int argc, char *argv[]) {    
     while(1) {
-        char *str = NULL, c = '\0', **tokens = NULL;
-        int tokenCount = 0, size = 0;
-
-        str = (char*)malloc(sizeof(char));
-
         printf("sheLLiFY >>> ");
+        char *str = readInput(), **tokens = NULL;
+        int tokenCount = 0;
 
-        while ((c = getchar()) != '\n') {
-            str = realloc(str, (size + 1) * sizeof(char));
-            str[size++] = c;
-        }
-        str[size] = '\0';
-       
         tokenizeInput(str, &tokens, &tokenCount);
 
         commandHandler(tokens);
