@@ -118,6 +118,12 @@ int main(int argc, char *argv[]) {
         char *str = readInput(), **tokens = NULL;
         int tokenCount = 0;
 
+        while(strcmp(str, "") == 0) {
+            free(str);
+            printf("sheLLiFY >>> ");
+            str = readInput();
+        }
+
         tokenizeInput(str, &tokens, &tokenCount);
 
         commandHandler(tokens);
