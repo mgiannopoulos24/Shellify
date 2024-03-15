@@ -13,10 +13,17 @@ typedef struct {
 void exitShell();
 void changeDirectory(char *tokens[]);
 void printWorkingDirectory();
-/* void echo(); */
+void echo(char *tokens[]);
 /* void sourceFile(); */
 /* void killProcess(); */
 /* void showManual(); */
+
+void echoInput(char *tokens[]) {
+    for (int i = 1; tokens[i] != NULL; i++) {
+        printf("%s ", tokens[i]);
+    }
+    printf("\n");
+}
 
 void printWorkingDirectory() {
     char cwd[PATH_MAX];
@@ -54,7 +61,7 @@ void commandHandler(char *tokens[]) {
     internalCommand builtIn[] = {
         {"cd", changeDirectory},
         {"pwd", printWorkingDirectory},
-        /* {"echo", echo}, */
+        {"echo", echoInput},
         {"exit", exitShell},
         /* {"source", sourceFile}, */
         /* {"kill", killProcess}, */
