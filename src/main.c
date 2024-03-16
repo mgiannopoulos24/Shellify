@@ -17,7 +17,7 @@ typedef struct {
 void exitShell();
 void changeDirectory(char *tokens[]);
 void printWorkingDirectory();
-void echo(char *tokens[]);
+void echoInput(char *tokens[]);
 
 void echoInput(char *tokens[]) {
     for (int i = 1; tokens[i] != NULL; i++) {
