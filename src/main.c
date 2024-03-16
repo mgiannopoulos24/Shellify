@@ -2,7 +2,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include <unistd.h>
+#include <sys/wait.h>
 #define PATH_MAX 4096
 
 typedef struct {
@@ -81,7 +83,21 @@ void commandHandler(char *tokens[]) {
         printf("Command not found: %s\n", tokens[0]);
         return;
     }
-    execvp(tokens[0], tokens);
+
+    pid_t pid = fork();
+
+    switch (pid) {
+        case -1:
+            perror("Fork");
+            break;
+        case 0:
+            execvp(tokens[0], tokens);
+            perror("execvp");
+            exit(EXIT_FAILURE);
+        default:
+            wait(NULL);
+            break;
+    }
 }
 
 void tokenizeInput(char *input, char **tokens[], int *tokenCount) {
