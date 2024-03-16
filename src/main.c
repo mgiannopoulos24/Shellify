@@ -5,6 +5,8 @@
 #include <time.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <sys/types.h>
+#include <pwd.h>
 #define PATH_MAX 4096
 
 typedef struct {
@@ -16,7 +18,6 @@ void exitShell();
 void changeDirectory(char *tokens[]);
 void printWorkingDirectory();
 void echo(char *tokens[]);
-/* void sourceFile(); */
 
 void echoInput(char *tokens[]) {
     for (int i = 1; tokens[i] != NULL; i++) {
@@ -44,12 +45,27 @@ void exitShell() {
     exit(EXIT_SUCCESS);
 }
 
-bool externalCommand(char *args[]) {
-    const char *directory = "/usr/bin/";
-    unsigned int pathSize = strlen(directory) + strlen(args[0]) + 1; 
-    char filepath[pathSize];
+char *getUserName() {
+    uid_t uid = getuid();
+    struct passwd *pw = getpwuid(uid);
+    if(pw == NULL) {
+        perror("getpwuid");
+        return NULL;
+    }
+    return pw->pw_name;
+}
 
-    sprintf(filepath, "%s/%s", directory, args[0]);
+bool externalCommand(char *args[]) {
+    const char *userName = getUserName();
+    char filepath[PATH_MAX];
+
+    snprintf(filepath, sizeof(filepath), "/home/%s/.local/bin/%s", userName, args[0]);
+
+    if (access(filepath, F_OK) == 0) {
+        return true;
+    }
+
+    snprintf(filepath, sizeof(filepath), "/usr/bin/%s", args[0]);
 
     if (access(filepath, F_OK) == 0) {
         return true;
@@ -63,7 +79,6 @@ void commandHandler(char *tokens[]) {
         {"pwd", printWorkingDirectory},
         {"echo", echoInput},
         {"exit", exitShell},
-        /* {"source", sourceFile}, */
     };
    
     int commandsCount = sizeof(builtIn) / sizeof(builtIn[0]);
@@ -81,7 +96,6 @@ void commandHandler(char *tokens[]) {
     }
 
     pid_t pid = fork();
-
     switch (pid) {
         case -1:
             perror("Fork");
