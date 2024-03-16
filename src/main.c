@@ -17,8 +17,6 @@ void changeDirectory(char *tokens[]);
 void printWorkingDirectory();
 void echo(char *tokens[]);
 /* void sourceFile(); */
-/* void killProcess(); */
-/* void showManual(); */
 
 void echoInput(char *tokens[]) {
     for (int i = 1; tokens[i] != NULL; i++) {
@@ -66,8 +64,6 @@ void commandHandler(char *tokens[]) {
         {"echo", echoInput},
         {"exit", exitShell},
         /* {"source", sourceFile}, */
-        /* {"kill", killProcess}, */
-        /* {"man", showManual} */
     };
    
     int commandsCount = sizeof(builtIn) / sizeof(builtIn[0]);
