@@ -124,16 +124,32 @@ void tokenizeInput(char *input, char **tokens[], int *tokenCount) {
 }
 
 char *readInput() {
-    char *str = NULL, c; 
+    char *str = NULL, *temp = NULL, c;
     int size = 0;
 
     str = (char*)malloc(sizeof(char));
+    if (!str) {
+        // Handle malloc failure
+        return NULL;
+    }
 
     while ((c = getchar()) != '\n') {
-        str = realloc(str, (size + 1) * sizeof(char));
+        temp = realloc(str, (size + 1) * sizeof(char));
+        if (!temp) {
+            // Handle realloc failure
+            free(str);
+            return NULL;
+        }
+        str = temp;
         str[size++] = c;
     }
-    str = realloc(str, (size + 1) * sizeof(char));
+    temp = realloc(str, (size + 1) * sizeof(char));
+    if (!temp) {
+        // Handle realloc failure
+        free(str);
+        return NULL;
+    }
+    str = temp;
     str[size] = '\0';
     return str;
 }
